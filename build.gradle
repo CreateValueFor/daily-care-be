@@ -1,0 +1,139 @@
+plugins {
+    id "org.springframework.boot" version "2.7.4"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "java"
+}
+
+group = "com.example"
+version = "0.1.0"
+sourceCompatibility = "11"
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set("springCloudVersion", "2021.0.4")
+    set("springCloudAWSVersion", "2.4.4")
+    set("lombokVersion", "1.18.24")
+    set("openfeignVersion", "3.0.4")
+    set("guavaVersion", "31.0.1-jre")
+    set("feignJaxbVersion", "11.6")
+    set("javaxValidationVersion", "2.0.1.Final")
+    set("jaxbApiVersion", "2.3.1")
+    set("commonsCodecVersion", "1.15")
+    set("mapstructVersion", "1.4.2.Final")
+    set("apacheCommonsVersion", "3.8.1")
+    set("mariadbClientVersion", "2.3.0")
+    set("hibernateValidatorVersion", "6.0.16.Final")
+    set("apacheCommonsCsvVersion", "1.8")
+    set("springJwtVersion", "1.0.10.RELEASE")
+    set("queryDslVersion", "5.0.0")
+    set("hibernateTypeVersion", "3.1.2")
+}
+
+dependencies {
+
+    // Auth
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+
+    implementation "org.springframework.security:spring-security-data"
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "org.springframework.security:spring-security-core"
+    implementation "org.springframework.security:spring-security-jwt:${springJwtVersion}"
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+
+    implementation 'com.google.code.gson:gson'
+    implementation "org.springframework.boot:spring-boot-starter-data-rest"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${openfeignVersion}"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "io.github.openfeign:feign-jaxb:${feignJaxbVersion}"
+    implementation "javax.validation:validation-api:${javaxValidationVersion}"
+    implementation "commons-codec:commons-codec:${commonsCodecVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-batch"
+    implementation "eu.bitwalker:UserAgentUtils:1.21"
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation "javax.xml.bind:jaxb-api:2.3.1"
+    implementation "com.sun.xml.bind:jaxb-core:2.3.0.1"
+    implementation "com.sun.xml.bind:jaxb-impl:2.3.1"
+
+    // QueryDSL
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    annotationProcessor(
+            "javax.persistence:javax.persistence-api",
+            "javax.annotation:javax.annotation-api",
+            "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+    implementation "org.passay:passay:1.4.0"
+    implementation "com.google.firebase:firebase-admin:9.1.1"
+    // sever to server
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    implementation "org.apache.commons:commons-csv:${apacheCommonsCsvVersion}"
+
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation 'org.springframework.data:spring-data-envers'
+
+    implementation "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+    implementation "io.hypersistence:hypersistence-utils-hibernate-55:${hibernateTypeVersion}"
+
+    // excel 관련
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+
+    // XML
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0"
+
+    // X-Ray
+    // AWS
+    implementation 'com.amazonaws:aws-xray-recorder-sdk-spring:2.11.0'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws'
+    implementation 'io.awspring.cloud:spring-cloud-aws-messaging'
+
+    // mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // FILE mime type
+    implementation "org.apache.tika:tika-parsers:1.22"
+
+    runtimeOnly "org.mariadb.jdbc:mariadb-java-client:${mariadbClientVersion}"
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+    runtimeOnly "mysql:mysql-connector-java"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+    implementation 'com.h2database:h2'
+    implementation 'io.opentracing:opentracing-api:0.33.0'
+    implementation 'io.opentracing:opentracing-util:0.33.0'
+
+    testImplementation 'com.flextrade.jfixture:jfixture:2.7.2'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAWSVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
