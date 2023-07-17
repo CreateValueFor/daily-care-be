@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -32,5 +33,10 @@ public class MovementService extends BaseService<Movement, MovementRepository> {
         movement.setUser(getContextUser());
         save(movement);
         return movementMapper.entityToDto(movement);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MovementViewDto> getMyMovements() {
+        return movementMapper.entitiesToDtos(repository.findAllByUserOrderByLocalDateDesc(getContextUser()));
     }
 }
