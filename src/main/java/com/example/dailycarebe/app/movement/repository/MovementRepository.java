@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface MovementRepository extends BaseRepository<Movement> {
     Optional<Movement> findByLocalDateAndUser(LocalDate localDate, User user);
 
-    List<Movement> findAllByUserOrderByLocalDateDesc(User user);
+    List<Movement> findAllByUserOrderByLocalDateAsc(User user);
 }

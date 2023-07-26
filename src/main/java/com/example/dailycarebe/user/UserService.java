@@ -1,5 +1,6 @@
 package com.example.dailycarebe.user;
 
+import com.example.dailycarebe.app.exercise.model.CourseWeekType;
 import com.example.dailycarebe.auth.authentication.AppUserDetails;
 import com.example.dailycarebe.auth.authentication.AppUserDetailsService;
 import com.example.dailycarebe.auth.authentication.dto.UserAuthDto;
@@ -95,6 +96,13 @@ public class UserService extends BaseService<User, UserRepository> {
 
     User user = userMapper.registerDtoToEntity(registerDto);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+
+    user.setCourseWeekType(CourseWeekType.FIRST);
+    user.setCourseDay(1);
+    user.setIsCourseUpgradable(true);
+    user.setStartDate(LocalDate.now());
+    user.setNextWeek(LocalDate.now().plusWeeks(1));
     User entity = saveDirectly(user);
 
     Long userId = entity.getId();

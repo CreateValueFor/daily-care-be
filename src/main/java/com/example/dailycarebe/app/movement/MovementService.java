@@ -37,6 +37,6 @@ public class MovementService extends BaseService<Movement, MovementRepository> {
 
     @Transactional(readOnly = true)
     public List<MovementViewDto> getMyMovements() {
-        return movementMapper.entitiesToDtos(repository.findAllByUserOrderByLocalDateDesc(getContextUser()));
+        return movementMapper.entitiesToDtos(repository.findAllByUserOrderByLocalDateAsc(getContextUser()));
     }
 }

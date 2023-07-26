@@ -1,5 +1,7 @@
 package com.example.dailycarebe.user.model;
 
+import com.example.dailycarebe.app.exercise.model.CourseType;
+import com.example.dailycarebe.app.exercise.model.CourseWeekType;
 import com.example.dailycarebe.base.orm.model.AbstractAuditingEntity;
 import com.example.dailycarebe.user.auth.authorization.model.UserAppRole;
 import com.example.dailycarebe.util.HashidsUtil;
@@ -56,6 +58,22 @@ public class User extends AbstractAuditingEntity {
   @Column
   private String fcmToken;
 
+  @Column
+  @Enumerated(EnumType.STRING)
+  private UserExerciseType userExerciseType;
+
+  @Column
+  @Enumerated(EnumType.STRING)
+  private CourseWeekType courseWeekType;
+
+  @Column
+  private Integer courseDay;
+
+  private Boolean isCourseUpgradable;
+
+  private LocalDate startDate;
+
+  private LocalDate nextWeek;
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
