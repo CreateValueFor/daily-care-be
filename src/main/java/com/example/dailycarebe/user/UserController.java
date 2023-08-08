@@ -7,6 +7,7 @@ import com.example.dailycarebe.user.dto.UserEditDto;
 import com.example.dailycarebe.user.dto.UserLoginDto;
 import com.example.dailycarebe.user.dto.UserRegisterDto;
 import com.example.dailycarebe.user.dto.UserViewDto;
+import com.example.dailycarebe.user.statistics.UserStatisticsViewDto;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,4 +51,8 @@ public class UserController extends BaseComponent {
     return CustomResponse.ok(userService.login(loginDto));
   }
 
+  @GetMapping("/age")
+  public ResponseEntity<CustomResponse<UserStatisticsViewDto>> getStatistics(Integer age) {
+    return CustomResponse.ok(userService.getUserStatistics(age));
+  }
 }

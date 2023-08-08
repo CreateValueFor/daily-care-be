@@ -25,6 +25,9 @@ import com.example.dailycarebe.user.model.ProviderType;
 import com.example.dailycarebe.user.model.User;
 import com.example.dailycarebe.user.model.UserGender;
 import com.example.dailycarebe.user.repository.UserRepository;
+import com.example.dailycarebe.user.statistics.UserStatisticsRepository;
+import com.example.dailycarebe.user.statistics.UserStatisticsViewDto;
+import com.example.dailycarebe.user.statistics.model.UserStatistics;
 import com.example.dailycarebe.util.PasswordUtil;
 import com.example.dailycarebe.util.SecurityContextUtil;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +64,7 @@ public class UserService extends BaseService<User, UserRepository> {
 
   private final JWTTokenUtil jwtTokenUtil;
 
+  private final UserStatisticsRepository userStatisticsRepository;
 
 
   @Autowired
@@ -74,23 +78,18 @@ public class UserService extends BaseService<User, UserRepository> {
 //        throw new InvalidRequestException("번호 인증이 되지 않았습니다.");
 //    });
 
-    repository.findAllByPhone(registerDto.getPhone())
-      .ifPresent((userList) -> {
-        if(!userList.isEmpty()) {
-          throw new InvalidDataRequestException("이미 존재하는 번호입니다.");
-        }
-      });
-
+//    repository.findAllByPhone(registerDto.getPhone())
+//      .ifPresent((userList) -> {
+//        if(!userList.isEmpty()) {
+//          throw new InvalidDataRequestException("이미 존재하는 번호입니다.");
+//        }
+//      });
+//
     String username = registerDto.getLoginId();
 
     repository.findByLoginId(username)
       .ifPresent((user) -> {
-        throw new InvalidDataRequestException("이미 존재하는 아이디입니다.");
-      });
-
-    repository.findByEmail(registerDto.getEmail())
-      .ifPresent((user) -> {
-        throw new InvalidDataRequestException("이미 존재하는 이메일입니다.");
+        throw new InvalidDataRequestException("이미 존재하는 아이디(이름)입니다.");
       });
 
 
@@ -100,6 +99,7 @@ public class UserService extends BaseService<User, UserRepository> {
 
     user.setCourseWeekType(CourseWeekType.FIRST);
     user.setCourseDay(1);
+    user.setCourseWeek(1);
     user.setIsCourseUpgradable(true);
     user.setStartDate(LocalDate.now());
     user.setNextWeek(LocalDate.now().plusWeeks(1));
@@ -252,6 +252,26 @@ public class UserService extends BaseService<User, UserRepository> {
     return userAuthDto;
   }
 
+  @Transactional(readOnly = true)
+  public UserStatisticsViewDto getUserStatistics(Integer age) {
+    if(age < 20) {
+      age = 19;
+    } else if (age > 80){
+      age = 80;
+    } else {
+      age = age / 10 * 10;
+    }
+    UserStatistics userStatistics = userStatisticsRepository.findByAge(age);
+
+    UserStatisticsViewDto userStatisticsViewDto = new UserStatisticsViewDto();
+
+    userStatisticsViewDto.setHeight(userStatistics.getHeight());
+    userStatisticsViewDto.setWeight(userStatistics.getWeight());
+
+    return userStatisticsViewDto;
+
+
+  }
 
 
 }

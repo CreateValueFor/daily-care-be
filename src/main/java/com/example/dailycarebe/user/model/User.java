@@ -30,7 +30,6 @@ public class User extends AbstractAuditingEntity {
 
   private String loginId;
 
-  @Email
   private String email;
 
   private String name;
@@ -67,6 +66,9 @@ public class User extends AbstractAuditingEntity {
   private CourseWeekType courseWeekType;
 
   @Column
+  private Integer courseWeek;
+
+  @Column
   private Integer courseDay;
 
   private Boolean isCourseUpgradable;
@@ -80,6 +82,56 @@ public class User extends AbstractAuditingEntity {
   @Builder.Default
   private Set<UserAppRole> roles = new HashSet<>();
 
+  @Column
+  private Double height;
+
+  @Column
+  private Double weight;
+
+  @Column
+  private Integer drinkingFrequency;
+
+  @Column
+  private Integer isSmoking;
+
+  @Column
+  private Integer workOutFrequency;
+
+  @Column
+  private Integer constipationFrequency;
+
+  @Column
+  private Integer diarrheaFrequency;
+
+  @Column
+  private Integer bloodStoolFrequency;
+
+  @Column
+  private Integer mucusStoolFrequency;
+
+  @Column
+  private Integer bowelMovementsDayTimeFrequency;
+
+  @Column
+  private Integer bowelMovementsNightTimeFrequency;
+
+  @Column
+  private Integer rectalPainFrequency;
+
+  @Column
+  private Integer gasBloatingFrequency;
+
+  @Column
+  private Integer gasLeakingFrequency;
+
+  @Column
+  private Integer stoolLeakingFrequency;
+
+  @Column
+  private Integer anusPainFrequency;
+
+  @Column
+  private Integer panicFrequency;
 
   public static User of(String uuid) {
     User user = new User();

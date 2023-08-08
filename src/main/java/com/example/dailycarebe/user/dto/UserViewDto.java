@@ -28,4 +28,36 @@ public class UserViewDto extends AbstractAuditingDto {
 
   private ProviderType provider;
 
+  private Double height;
+  private Double weight;
+
+  private Integer drinkingFrequency;
+
+  private Integer isSmoking;
+
+  private Integer workOutFrequency;
+
+  private Integer constipationFrequency;
+
+  private Integer diarrheaFrequency;
+
+  private Integer bloodStoolFrequency;
+
+  private Integer mucusStoolFrequency;
+
+  private Integer bowelMovementsDayTimeFrequency;
+
+  private Integer bowelMovementsNightTimeFrequency;
+
+  private Integer rectalPainFrequency;
+
+  private Integer gasBloatingFrequency;
+
+  private Integer gasLeakingFrequency;
+
+  private Integer stoolLeakingFrequency;
+
+  private Integer anusPainFrequency;
+
+  private Integer panicFrequency;
 }

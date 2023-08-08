@@ -13,7 +13,7 @@ import java.util.List;
 
 @Mapper(
   unmappedTargetPolicy = ReportingPolicy.IGNORE,
-  componentModel = "spring", uses = {HashIdsMapper.class, UserIdMapper.class})
+  componentModel = "spring", uses = {HashIdsMapper.class, UserIdMapper.class, UserInfoMapper.class})
 public interface UserMapper {
   @Mapping(target = "uuid", source = "id")
   UserViewDto entityToDto(User entity);

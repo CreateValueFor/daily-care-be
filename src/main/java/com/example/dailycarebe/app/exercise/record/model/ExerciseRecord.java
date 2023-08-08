@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class ExerciseRecord extends AbstractAuditingEntity {
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Exercise exercise;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -33,6 +33,7 @@ public class ExerciseRecord extends AbstractAuditingEntity {
     @Column
     private LocalDate today;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private CourseWeekType courseWeekType;
 
@@ -42,4 +43,7 @@ public class ExerciseRecord extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column
     private ExerciseEvaluationType exerciseEvaluationType;
+
+    @Column(columnDefinition = "BIT DEFAULT 0")
+    private Boolean complete;
 }

@@ -25,6 +25,9 @@ public class ExerciseInitiate extends AbstractAuditingEntity {
     @Column
     private CourseWeekType courseWeekType;
 
+    @Column
+    private Integer courseWeek;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Exercise exercise;
 

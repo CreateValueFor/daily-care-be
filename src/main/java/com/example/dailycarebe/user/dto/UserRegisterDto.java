@@ -21,9 +21,6 @@ public class UserRegisterDto extends AbstractRegisterDto {
   @NotNull(message = "아이디는 필수 입력값 입니다.")
   private String loginId;
 
-  @ApiModelProperty(example = "email")
-  @NotNull(message = "이메일은 필수 입력값 입니다.")
-  @Email(message = "이메일 형식에 맞게 입력해 주세요.")
   private String email;
 
   @ApiModelProperty(example = "password")
@@ -35,7 +32,7 @@ public class UserRegisterDto extends AbstractRegisterDto {
   private String name;
 
   @ApiModelProperty(example = "01085711175")
-  @NotNull(message = "핸드폰 번호는 필수 입력값 입니다.")
+//  @NotNull(message = "핸드폰 번호는 필수 입력값 입니다.")
   private String phone;
 
 //  @ApiModelProperty(example = "1999-11-11")
@@ -46,4 +43,37 @@ public class UserRegisterDto extends AbstractRegisterDto {
   @ApiModelProperty(example = "MALE")
   @NotNull(message = "성별 정보는 필수 입력값 입니다.")
   private UserGender gender;
+
+  private Double height;
+  private Double weight;
+
+  private Integer drinkingFrequency;
+
+  private Integer isSmoking;
+
+  private Integer workOutFrequency;
+
+  private Integer constipationFrequency;
+
+  private Integer diarrheaFrequency;
+
+  private Integer bloodStoolFrequency;
+
+  private Integer mucusStoolFrequency;
+
+  private Integer bowelMovementsDayTimeFrequency;
+
+  private Integer bowelMovementsNightTimeFrequency;
+
+  private Integer rectalPainFrequency;
+
+  private Integer gasBloatingFrequency;
+
+  private Integer gasLeakingFrequency;
+
+  private Integer stoolLeakingFrequency;
+
+  private Integer anusPainFrequency;
+
+  private Integer panicFrequency;
 }

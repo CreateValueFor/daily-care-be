@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ExerciseInitiateRepository extends BaseRepository<ExerciseInitiate> {
     List<ExerciseInitiate> findAllByUserExerciseTypeAndCourseWeekType(UserExerciseType userExerciseType, CourseWeekType courseWeekType);
+    List<ExerciseInitiate> findAllByUserExerciseTypeAndCourseWeek(UserExerciseType userExerciseType, Integer courseWeek);
 }

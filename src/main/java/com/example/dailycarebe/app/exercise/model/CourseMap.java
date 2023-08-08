@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 @DynamicInsert
@@ -16,9 +18,11 @@ import javax.persistence.Entity;
 @Setter
 public class CourseMap extends AbstractAuditingEntity {
     @Column
+    @Enumerated(EnumType.STRING)
     private CourseType courseType;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private CourseWeekType courseWeekType;
 
     @Column
