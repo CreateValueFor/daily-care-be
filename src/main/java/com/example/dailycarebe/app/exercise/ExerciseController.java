@@ -9,6 +9,7 @@ import com.example.dailycarebe.rest.CustomResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class ExerciseController extends BaseComponent {
     }
 
     @PostMapping("/evaluate")
-    public void evaluate(List<ExerciseRecordEditDto> editDtos) {
+    public void evaluate(@RequestBody List<ExerciseRecordEditDto> editDtos) {
         exerciseService.evaluate(editDtos);
     }
 

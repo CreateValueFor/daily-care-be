@@ -38,12 +38,17 @@ class SecurityConfig {
         , "/api/v1/users/**"
         , "/api/v1/users/action/login"
         , "/api/v1/auth/kakao"
+        , "/api/v1/food/search"
+//        , "/api/v1/food/**"
+
       )
       .antMatchers(HttpMethod.GET
         , "/api/v1/health"
         , "/api/v1/action/convert-hash"
         , "/api/v1/action/convert-id"
         , "/api/v1/users/age"
+        , "/api/v1/food/search"
+//        , "/api/v1/food/**"
       )
       ;
   }
