@@ -23,6 +23,7 @@ import com.example.dailycarebe.user.dto.UserViewDto;
 import com.example.dailycarebe.user.mapper.UserMapper;
 import com.example.dailycarebe.user.model.ProviderType;
 import com.example.dailycarebe.user.model.User;
+import com.example.dailycarebe.user.model.UserExerciseType;
 import com.example.dailycarebe.user.model.UserGender;
 import com.example.dailycarebe.user.repository.UserRepository;
 import com.example.dailycarebe.user.statistics.UserStatisticsRepository;
@@ -103,6 +104,7 @@ public class UserService extends BaseService<User, UserRepository> {
     user.setIsCourseUpgradable(true);
     user.setStartDate(LocalDate.now());
     user.setNextWeek(LocalDate.now().plusWeeks(1));
+    user.setUserExerciseType(UserExerciseType.GASSY);//TODO:변경로직추가
     User entity = saveDirectly(user);
 
     Long userId = entity.getId();

@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring", uses = {HashIdsMapper.class, UserIdMapper.class})
+        componentModel = "spring", uses = {HashIdsMapper.class, UserIdMapper.class, MovementDetailMapper.class})
 public interface MovementMapper {
     @Mapping(target = "uuid", source = "id")
     MovementViewDto entityToDto(Movement movement);

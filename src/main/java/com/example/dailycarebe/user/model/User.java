@@ -133,6 +133,8 @@ public class User extends AbstractAuditingEntity {
   @Column
   private Integer panicFrequency;
 
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  private Set<UserPain> userPains;
   public static User of(String uuid) {
     User user = new User();
     user.setId(HashidsUtil.decodeNumber(uuid));

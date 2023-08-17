@@ -28,4 +28,9 @@ public class MovementController extends BaseComponent {
     public ResponseEntity<CustomResponse<List<MovementViewDto>>> getMyMovements() {
         return CustomResponse.ok(movementService.getMyMovements());
     }
+
+    @DeleteMapping("/delete")
+    public void deleteDetail(String uuid) {
+        movementService.deleteDetail(uuid);
+    }
 }

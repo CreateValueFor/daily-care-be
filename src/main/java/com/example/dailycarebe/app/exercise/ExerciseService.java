@@ -199,6 +199,9 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
         List<Exercise> beforeExerciseList = yesterdayExerciseList.stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
 
 
+        List<Exercise> not = yesterdayExerciseList.stream().filter(exerciseRecord -> exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.NULL)
+                .collect(Collectors.toList()).stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+
 //        List<Exercise> exerciseList =
 //                exerciseInitiateRepository
 //                .findAllByUserExerciseTypeAndCourseWeekType
@@ -225,6 +228,13 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
             exerciseRecord.setUser(user);
             exerciseRecord.setExercise(exercise);
+            if(not.contains(exercise)) {
+                Exercise finalExercise = exercise;
+                exerciseRecord.setCourseType(yesterdayExerciseList.stream().filter(exerciseRecord1 -> exerciseRecord1.getExercise() == finalExercise).findFirst().get().getCourseType());
+            } else {
+                exerciseRecord.setCourseType(courseType);
+
+            }
             exerciseRecord.setCourseType(courseType);
             exerciseRecord.setCourseWeekType(user.getCourseWeekType());
             exerciseRecord.setCourseDay(user.getCourseDay());
@@ -234,7 +244,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
         });
 
         beforeExerciseList.forEach(exercise -> {
-            if(easy.contains(exercise)) {
+            if(easy.contains(exercise) && user.getCourseWeek() > 2) {
 
                 ExerciseRecord exerciseRecord = new ExerciseRecord();
 

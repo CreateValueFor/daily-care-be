@@ -5,6 +5,7 @@ import com.example.dailycarebe.app.movement.dto.MovementViewDto;
 import com.example.dailycarebe.app.movement.mapper.MovementMapper;
 import com.example.dailycarebe.app.movement.model.Movement;
 import com.example.dailycarebe.app.movement.model.MovementDetail;
+import com.example.dailycarebe.app.movement.repository.MovementDetailRepository;
 import com.example.dailycarebe.app.movement.repository.MovementRepository;
 import com.example.dailycarebe.base.BaseService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -19,6 +21,8 @@ import java.util.Set;
 public class MovementService extends BaseService<Movement, MovementRepository> {
 
     private final MovementMapper movementMapper;
+
+    private final MovementDetailRepository movementDetailRepository;
 
     @Transactional
     public MovementViewDto registerMovement(MovementRegisterDto registerDto) {
@@ -38,5 +42,12 @@ public class MovementService extends BaseService<Movement, MovementRepository> {
     @Transactional(readOnly = true)
     public List<MovementViewDto> getMyMovements() {
         return movementMapper.entitiesToDtos(repository.findAllByUserOrderByLocalDateAsc(getContextUser()));
+    }
+
+    @Transactional
+    public void deleteDetail(String uuid) {
+        MovementDetail movement = movementDetailRepository.getReferenceById(convertToId(uuid));
+
+        movementDetailRepository.delete(movement);
     }
 }
