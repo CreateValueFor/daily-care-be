@@ -21,10 +21,7 @@ import com.example.dailycarebe.user.dto.UserLoginDto;
 import com.example.dailycarebe.user.dto.UserRegisterDto;
 import com.example.dailycarebe.user.dto.UserViewDto;
 import com.example.dailycarebe.user.mapper.UserMapper;
-import com.example.dailycarebe.user.model.ProviderType;
-import com.example.dailycarebe.user.model.User;
-import com.example.dailycarebe.user.model.UserExerciseType;
-import com.example.dailycarebe.user.model.UserGender;
+import com.example.dailycarebe.user.model.*;
 import com.example.dailycarebe.user.repository.UserRepository;
 import com.example.dailycarebe.user.statistics.UserStatisticsRepository;
 import com.example.dailycarebe.user.statistics.UserStatisticsViewDto;
@@ -275,5 +272,23 @@ public class UserService extends BaseService<User, UserRepository> {
 
   }
 
-
+  @Transactional
+  public Boolean judgeUserUpper() {
+    User user = getContextUser();
+    Integer wristPain = user.getWristPain();
+    Integer shoulderPain = user.getShoulderPain();
+    Integer elbowPain = user.getElbowPain();
+    if(user.getIsUpper()) {
+      if(wristPain * shoulderPain * elbowPain == 1) {
+        user.setIsUpper(false);
+        user.setHasUpper(true);
+        user.setUpperCourseWeekType(CourseWeekType.FIRST);
+      }
+    } else {
+      if(wristPain > 3 || shoulderPain > 3 || elbowPain > 3 ) {
+        user.setIsUpper(true);
+      }
+    }
+    return user.getIsUpper();
+  }
 }

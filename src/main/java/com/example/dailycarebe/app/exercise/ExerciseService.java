@@ -59,14 +59,28 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
             } else {
 
+                //14. 1주일 넘게 빠졌을 경우에 빠진 전주로 다시 시작
+                if(localDate.isAfter(user.getNextWeek().plusDays(6))) {
+                    while(localDate.isBefore(user.getNextWeek())) {
+                        user.setNextWeek(user.getNextWeek().plusWeeks(1));
+                    }
+                    user.setCourseDay(1);
+                    user.setIsCourseUpgradable(true);
+                }
                 //오늘의 운동 생성 시작
                 //주가 아직 안바뀌어있다면? 바꿔주기 5
                 if(localDate.isAfter(user.getNextWeek().minusDays(1))) {
-                    if(user.getIsCourseUpgradable()) {
+                    if(user.getIsCourseUpgradable() && localDate.isBefore(user.getNextWeek().plusDays(6))) {
                         if(user.getCourseWeekType() == CourseWeekType.FIRST) {
                             user.setCourseWeekType(CourseWeekType.SECOND);
                         } else if(user.getCourseWeekType() == CourseWeekType.SECOND) {
                             user.setCourseWeekType(CourseWeekType.THIRD);
+                        }
+
+                        if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
+                            user.setUpperCourseWeekType(CourseWeekType.SECOND);
+                        } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
+                            user.setUpperCourseWeekType(CourseWeekType.THIRD);
                         }
                     }
 
@@ -88,7 +102,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                     ExerciseRecord exerciseRecord = new ExerciseRecord();
                     exerciseRecord.setCourseType(CourseType.REST);
                     exerciseRecord.setCourseDay(user.getCourseDay());
-                    exerciseRecord.setCourseWeekType(user.getCourseWeekType());
+//                    exerciseRecord.setCourseWeekType(user.getCourseWeekType());
                     exerciseRecord.setToday(localDate);
                     exerciseRecord.setUser(user);
                     exerciseRecordRepository.save(exerciseRecord);
@@ -99,7 +113,18 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                             exerciseRecordRepository
                                     .findAllByUserAndToday(user, searching);
 
-                    while (yesterdayExerciseList.size() == 1 ) {
+                    while (yesterdayExerciseList.size() < 2 ) {
+                        if(yesterdayExerciseList.size() < 1) {
+                            ExerciseRecord exerciseRecord = new ExerciseRecord();
+                            exerciseRecord.setCourseType(CourseType.REST);
+                            exerciseRecord.setCourseDay(user.getCourseDay());
+                            exerciseRecord.setCourseWeekType(user.getCourseWeekType());
+                            exerciseRecord.setToday(searching);
+                            exerciseRecord.setUser(user);
+                            exerciseRecordRepository.save(exerciseRecord);
+
+                        }
+
                         searching = searching.minusDays(1);
                         yesterdayExerciseList = exerciseRecordRepository
                                 .findAllByUserAndToday(user, searching);
@@ -127,32 +152,32 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
 
         //2,3
-        if(user.getCourseWeekType() == CourseWeekType.THIRD) {
-            if(user.getCourseDay() == 3) {
-                List<ExerciseAdditional> e = exerciseAdditionalRepository.findAllByCourseDayAndCourseWeekAndCourseType(
-                        2, user.getCourseWeek(), CourseType.HIGH
-                );
-
-                e.forEach(exerciseAdditional -> {
-                    ExerciseRecord tmp = new ExerciseRecord();
-                    tmp.setExercise(exerciseAdditional.getExercise());
-                    exerciseList.add(tmp);
-                });
-
-            } else if (user.getCourseDay() == 5) {
-                List<ExerciseAdditional> e = exerciseAdditionalRepository.findAllByCourseDayAndCourseWeekAndCourseType(
-                        1, user.getCourseWeek(), CourseType.MEDIUM
-                );
-
-                e.forEach(exerciseAdditional -> {
-                    ExerciseRecord tmp = new ExerciseRecord();
-                    tmp.setExercise(exerciseAdditional.getExercise());
-                    exerciseList.add(tmp);
-                });
-
-            }
-        }
-
+//        if(user.getCourseWeekType() == CourseWeekType.THIRD) {
+//            if(user.getCourseDay() == 3) {
+//                List<ExerciseAdditional> e = exerciseAdditionalRepository.findAllByCourseDayAndCourseWeekAndCourseType(
+//                        2, user.getCourseWeek(), CourseType.HIGH
+//                );
+//
+//                e.forEach(exerciseAdditional -> {
+//                    ExerciseRecord tmp = new ExerciseRecord();
+//                    tmp.setExercise(exerciseAdditional.getExercise());
+//                    exerciseList.add(tmp);
+//                });
+//
+//            } else if (user.getCourseDay() == 5) {
+//                List<ExerciseAdditional> e = exerciseAdditionalRepository.findAllByCourseDayAndCourseWeekAndCourseType(
+//                        1, user.getCourseWeek(), CourseType.MEDIUM
+//                );
+//
+//                e.forEach(exerciseAdditional -> {
+//                    ExerciseRecord tmp = new ExerciseRecord();
+//                    tmp.setExercise(exerciseAdditional.getExercise());
+//                    exerciseList.add(tmp);
+//                });
+//
+//            }
+//        }
+//
         return exerciseRecordMapper.entitiesToDtos(exerciseList);
     }
 
@@ -161,22 +186,31 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
     public void userExerciseInitiate(User user) {
         UserExerciseType exerciseType = user.getUserExerciseType();
 
-        if(exerciseType == UserExerciseType.GASSY) {
+        if(exerciseType != null) {
             List<Exercise> exerciseList =
             exerciseInitiateRepository.
-                    findAllByUserExerciseTypeAndCourseWeekType
-                            (user.getUserExerciseType(), user.getCourseWeekType())
+                    findAllByUserExerciseTypeAndCourseWeek
+                            (user.getUserExerciseType(), user.getCourseWeek())
                     .stream().map(ExerciseInitiate::getExercise).collect(Collectors.toList());
 
             exerciseList.forEach(exercise -> {
                 ExerciseRecord exerciseRecord = new ExerciseRecord();
 
                 exerciseRecord.setUser(user);
-                exerciseRecord.setExercise(exercise);
+                if(user.getIsUpper()) {
+                    exerciseRecord.setExercise(
+                            repository.findByPostureTypeAndName(PostureType.UPPER, exercise.getName())
+                    );
+
+                } else {
+                    exerciseRecord.setExercise(exercise);
+
+                }
                 exerciseRecord.setCourseType(CourseType.LOW);
                 exerciseRecord.setToday(LocalDate.now());
                 exerciseRecord.setCourseWeekType(user.getCourseWeekType());
                 exerciseRecord.setCourseDay(user.getCourseDay());
+                exerciseRecord.setIsCourseUpgradable(true);
 
                 exerciseRecordRepository.save(exerciseRecord);
             });
@@ -186,134 +220,302 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
     @Transactional
     public void createExerciseTodayFromYesterday(User user, List<ExerciseRecord> yesterdayExerciseList, LocalDate localDate) {
-        List<Exercise> difficult =
-                yesterdayExerciseList.stream().filter(exerciseRecord -> exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT)
-                .collect(Collectors.toList())
-                        .stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+        List<ExerciseRecord> yesterDayExerciseList1 = yesterdayExerciseList;
 
-        List<Exercise> easy =
-                yesterdayExerciseList.stream().filter(exerciseRecord -> exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.EASY)
-                        .collect(Collectors.toList())
-                        .stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+        //3. 2세트를 한 동작에 "어렵다"는 코스와 자세에 영향을 미치지 않음.
+        if(yesterDayExerciseList1.size() > 13) {
+            yesterDayExerciseList1 = yesterDayExerciseList1.subList(0, 13);
+        }
 
-        List<Exercise> beforeExerciseList = yesterdayExerciseList.stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+        yesterDayExerciseList1.forEach(beforeExerciseRecord -> {
+
+            ExerciseRecord newExerciseRecord = getEvaluate(beforeExerciseRecord);
+
+            int newCourseDay = newExerciseRecord.getCourseDay() +1;
+
+            if(newCourseDay == 4) {
+                newCourseDay = newCourseDay +1;
+            }
+
+            CourseType courseType =
+                    courseMapRepository
+                            .findByCourseWeekTypeAndCourseDay
+                                    (newExerciseRecord.getCourseWeekType(), newCourseDay)
+                            .getCourseType();
+
+            newExerciseRecord.setCourseType(courseType);
+            newExerciseRecord.setCourseDay(newCourseDay);
+
+            //13. 제공된 운동 영상 시간에 못한 동작들의 평가는 전체 평가로 입력되어 다음날 제공
+            if(beforeExerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.NULL) {
+                newExerciseRecord.setCourseType(beforeExerciseRecord.getCourseType());
+                newExerciseRecord.setCourseDay(beforeExerciseRecord.getCourseDay());
+
+            }
+
+//            newExerciseRecord.setCourseWeekType(newExerciseRecord.getCourseWeekType());
+            newExerciseRecord.setToday(localDate);
+
+//            newExerciseRecord.setIsCourseUpgradable(newExerciseRecord.getIsCourseUpgradable());
+
+            exerciseRecordRepository.save(newExerciseRecord);
+
+        });
 
 
-        List<Exercise> not = yesterdayExerciseList.stream().filter(exerciseRecord -> exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.NULL)
-                .collect(Collectors.toList()).stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+        List<ExerciseRecord> exerciseList =
+                exerciseRecordRepository.findAllByUserAndToday(user, localDate);
 
-//        List<Exercise> exerciseList =
-//                exerciseInitiateRepository
-//                .findAllByUserExerciseTypeAndCourseWeekType
-//                        (user.getUserExerciseType(), user.getCourseWeekType())
-//                        .stream().map(ExerciseInitiate::getExercise).collect(Collectors.toList());
+        if(exerciseList.size() > 12) {
+//            //3주차 이상 쉽다 같은강도 한번더 로직
+            exerciseList.forEach(todayExerciseRecord -> {
 
-        CourseType courseType =
-        courseMapRepository
-                .findByCourseWeekTypeAndCourseDay
-                        (user.getCourseWeekType(), user.getCourseDay())
-                .getCourseType();
+                ExerciseRecord exerciseRecord = exerciseRecordRepository.findByUserAndCourseTypeAndCourseWeekTypeAndExerciseAndTodayAfterAndExerciseEvaluationType(
+                        user, todayExerciseRecord.getCourseType(), todayExerciseRecord.getCourseWeekType(), todayExerciseRecord.getExercise(), user.getNextWeek().minusDays(7), ExerciseEvaluationType.EASY
+                );
 
-        beforeExerciseList.forEach(exercise -> {
-            if(difficult.contains(exercise)) {
-                if(exercise.getPostureType() == PostureType.DIFFICULT) {
-                    exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
+                if(exerciseRecord != null) {
+                    ExerciseRecord newExerciseRecord = new ExerciseRecord();
 
-                } else{
-                    exercise = repository.findByPostureTypeAndName(PostureType.EASY, exercise.getName());
+
+                    newExerciseRecord.setUser(user);
+                    newExerciseRecord.setExercise(exerciseRecord.getExercise());
+                    newExerciseRecord.setCourseType(exerciseRecord.getCourseType());
+                    newExerciseRecord.setCourseDay(todayExerciseRecord.getCourseDay());
+                    newExerciseRecord.setCourseWeekType(exerciseRecord.getCourseWeekType());
+                    newExerciseRecord.setToday(localDate);
+                    exerciseRecordRepository.save(newExerciseRecord);
 
                 }
-            }
-            ExerciseRecord exerciseRecord = new ExerciseRecord();
-
-            exerciseRecord.setUser(user);
-            exerciseRecord.setExercise(exercise);
-            if(not.contains(exercise)) {
-                Exercise finalExercise = exercise;
-                exerciseRecord.setCourseType(yesterdayExerciseList.stream().filter(exerciseRecord1 -> exerciseRecord1.getExercise() == finalExercise).findFirst().get().getCourseType());
-            } else {
-                exerciseRecord.setCourseType(courseType);
-
-            }
-            exerciseRecord.setCourseType(courseType);
-            exerciseRecord.setCourseWeekType(user.getCourseWeekType());
-            exerciseRecord.setCourseDay(user.getCourseDay());
-            exerciseRecord.setToday(localDate);
-
-            exerciseRecordRepository.save(exerciseRecord);
-        });
-
-        beforeExerciseList.forEach(exercise -> {
-            if(easy.contains(exercise) && user.getCourseWeek() > 2) {
-
-                ExerciseRecord exerciseRecord = new ExerciseRecord();
-
-                exerciseRecord.setUser(user);
-                exerciseRecord.setExercise(exercise);
-                exerciseRecord.setCourseType(courseType);
-                exerciseRecord.setCourseWeekType(user.getCourseWeekType());
-                exerciseRecord.setCourseDay(user.getCourseDay());
-                exerciseRecord.setToday(localDate);
-
-                exerciseRecordRepository.save(exerciseRecord);
-
-            }
-        });
+            });
+        }
 
     }
 
     @Transactional
     public void createExerciseTodayNewWeek(User user, List<ExerciseRecord> yesterdayExerciseList, LocalDate localDate) {
 
-        List<Exercise> beforeExerciseList = yesterdayExerciseList.stream().map(ExerciseRecord::getExercise).collect(Collectors.toList());
+        List<Exercise> notUpgradableList = yesterdayExerciseList.stream().filter(exerciseRecorde -> !exerciseRecorde.getIsCourseUpgradable()).map(ExerciseRecord::getExercise).collect(Collectors.toList());
 
-        List<ExerciseInitiate> initiates = exerciseInitiateRepository.findAllByUserExerciseTypeAndCourseWeek(user.getUserExerciseType(), user.getCourseWeek());
+        if(yesterdayExerciseList.size() > 13) {
+            yesterdayExerciseList = yesterdayExerciseList.subList(0,13);
+        }
+        yesterdayExerciseList.forEach(exercise -> {
+
+            if(
+                    (exercise.getCourseWeekType() == CourseWeekType.FIRST
+                            && exercise.getCourseDay() == 3)
+                            ||
+                            (exercise.getCourseWeekType() == CourseWeekType.SECOND
+                                    && exercise.getCourseDay() == 3)
+                            ||
+                            (exercise.getCourseWeekType() == CourseWeekType.THIRD
+                                    && exercise.getCourseDay() == 2)
+            ) {
+                //테스트 후 수정
+                if(exercise.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT) {
+                    exercise.setIsCourseUpgradable(false);
+                }
+            }
+
+            ExerciseRecord exerciseRecord = new ExerciseRecord();
+
+            exerciseRecord.setUser(user);
+            if(user.getIsUpper()) {
+                exerciseRecord.setExercise(
+                        repository.findByPostureTypeAndName(PostureType.UPPER, exercise.getExercise().getName())
+                );
+            } else {
+                if(user.getHasUpper()) {
+                    if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.EASY, exercise.getExercise().getName())
+                        );
+
+                    } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+                        );
+                    } else if (user.getUpperCourseWeekType() == CourseWeekType.THIRD) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+                        );
+                    }
+
+                } else {
+                    if(exercise.getIsCourseUpgradable()) {
+                        if(exercise.getExercise().getPostureType() == PostureType.EASY) {
+                            exerciseRecord.setExercise(repository.findByPostureTypeAndName(
+                                    PostureType.NORMAL, exercise.getExercise().getName()
+                            ));
+                        } else if(exercise.getExercise().getPostureType() == PostureType.NORMAL) {
+                            exerciseRecord.setExercise(repository.findByPostureTypeAndName(
+                                    PostureType.DIFFICULT, exercise.getExercise().getName()
+                            ));
+                        } else {
+                            exerciseRecord.setExercise(exercise.getExercise());
+
+                        }
+
+                    } else {
+                        exerciseRecord.setExercise(exercise.getExercise());
+
+                    }
+                }
+
+            }
+
+            if(exercise.getIsCourseUpgradable()) {
+                if(exercise.getCourseWeekType() == CourseWeekType.FIRST) {
+                    exerciseRecord.setCourseWeekType(CourseWeekType.SECOND);
+                } else {
+                    exerciseRecord.setCourseWeekType(CourseWeekType.THIRD);
+                }
+            } else {
+                exerciseRecord.setCourseWeekType(exercise.getCourseWeekType());
+            }
+
+            CourseType courseType =
+                    courseMapRepository
+                            .findByCourseWeekTypeAndCourseDay
+                                    (exerciseRecord.getCourseWeekType(), user.getCourseDay())
+                            .getCourseType();
 
 
-        CourseType courseType =
-        courseMapRepository
-                .findByCourseWeekTypeAndCourseDay
-                        (user.getCourseWeekType(), user.getCourseDay())
-                .getCourseType();
+            exerciseRecord.setCourseType(courseType);
+
+            if(user.getUpperCourseWeekType() != null ) {
+                exerciseRecord.setCourseWeekType(user.getUpperCourseWeekType());
+            }
+
+            exerciseRecord.setCourseDay(user.getCourseDay());
+            exerciseRecord.setToday(localDate);
+            exerciseRecord.setIsCourseUpgradable(true);
+            exerciseRecordRepository.save(exerciseRecord);
+
+        });
+
+//        List<ExerciseInitiate> initiates = exerciseInitiateRepository.findAllByUserExerciseTypeAndCourseWeek(user.getUserExerciseType(), user.getCourseWeek());
+        List<ExerciseInitiate> initiates = exerciseInitiateRepository.findAllByUserExerciseTypeAndCourseWeekTypeAndCourseWeek(user.getUserExerciseType(), CourseWeekType.FIRST, user.getCourseWeek());
 
         initiates.forEach(exercise -> {
 
             ExerciseRecord exerciseRecord = new ExerciseRecord();
 
             exerciseRecord.setUser(user);
-            exerciseRecord.setExercise(exercise.getExercise());
+            if(user.getIsUpper()) {
+                exerciseRecord.setExercise(
+                        repository.findByPostureTypeAndName(PostureType.UPPER, exercise.getExercise().getName())
+                );
+            } else {
+                if(user.getHasUpper()) {
+                    if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.EASY, exercise.getExercise().getName())
+                        );
+
+                    } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+                        );
+                    } else if (user.getUpperCourseWeekType() == CourseWeekType.THIRD) {
+                        exerciseRecord.setExercise(
+                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+                        );
+                    }
+
+                } else {
+                    exerciseRecord.setExercise(exercise.getExercise());
+                }
+
+            }
+                    CourseType courseType =
+                courseMapRepository
+                        .findByCourseWeekTypeAndCourseDay
+                                (exercise.getCourseWeekType(), user.getCourseDay())
+                        .getCourseType();
+
+
             exerciseRecord.setCourseType(courseType);
-            exerciseRecord.setCourseWeekType(user.getCourseWeekType());
+
+            exerciseRecord.setCourseWeekType(exercise.getCourseWeekType());
+            if(user.getUpperCourseWeekType() != null ) {
+                exerciseRecord.setCourseWeekType(user.getUpperCourseWeekType());
+            }
+
             exerciseRecord.setCourseDay(user.getCourseDay());
             exerciseRecord.setToday(localDate);
-
+            exerciseRecord.setIsCourseUpgradable(true);
             exerciseRecordRepository.save(exerciseRecord);
         });
 
     }
 
     @Transactional
-    public void getEvaluate(ExerciseRecord exerciseRecord) {
-        //첫번째 고강도 쉬움 다음날 자세상향
-        //4
-        User user = userRepository.getReferenceById(SecurityContextUtil.getUserId());
+    public ExerciseRecord getEvaluate(ExerciseRecord exerciseRecord) {
 
-        if(
-                (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
-                && exerciseRecord.getCourseDay() == 3)
-                ||
-                (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
-                && exerciseRecord.getCourseDay() == 3)
-                ||
-                (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
-                && exerciseRecord.getCourseDay() == 2)
-        ) {
-            if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT) {
-                user.setIsCourseUpgradable(false);
+        ExerciseRecord newExerciseRecord = new ExerciseRecord();
+        newExerciseRecord.setIsCourseUpgradable(exerciseRecord.getIsCourseUpgradable());
+        newExerciseRecord.setExercise(exerciseRecord.getExercise());
+        if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT) {
+            //4. 코스 상향은 매주 증가하지만 첫번째 고강도에서 ‘어렵다’로 응답할 경우 안함.
+            //두번째, 세번째 고강도에서 '어렵다'라고 해도 아무 영향 없음
+            if(
+                    (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
+                            && exerciseRecord.getCourseDay() == 3)
+                            ||
+                            (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
+                                    && exerciseRecord.getCourseDay() == 3)
+                            ||
+                            (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
+                                    && exerciseRecord.getCourseDay() == 2)
+            ) {
+                //테스트 후 수정
+                newExerciseRecord.setIsCourseUpgradable(false);
+            }
+            Exercise exercise = exerciseRecord.getExercise();
+
+            //6. 대상자가 어느 강도에서 든지 동작을 ‘어렵다’로 응답할 경우 다음날 자세 하향 (그 다음주에 영향 미치지 않음)
+            if(exercise.getPostureType() == PostureType.DIFFICULT) {
+                exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
+
+            } else{
+                exercise = repository.findByPostureTypeAndName(PostureType.EASY, exercise.getName());
             }
 
+            newExerciseRecord.setExercise(exercise);
+        } else if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.EASY) {
+            //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
+            if(
+                    (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
+                            && exerciseRecord.getCourseDay() == 3)
+                            ||
+                            (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
+                                    && exerciseRecord.getCourseDay() == 3)
+                            ||
+                            (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
+                                    && exerciseRecord.getCourseDay() == 2)
+            ) {
+                //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
+                Exercise exercise = exerciseRecord.getExercise();
+
+                if(exercise.getPostureType() == PostureType.EASY) {
+                    exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
+
+                } else{
+                    exercise = repository.findByPostureTypeAndName(PostureType.DIFFICULT, exercise.getName());
+                }
+
+                newExerciseRecord.setExercise(exercise);
+            }
 
         }
+        newExerciseRecord.setToday(exerciseRecord.getToday());
+        newExerciseRecord.setCourseWeekType(exerciseRecord.getCourseWeekType());
+        newExerciseRecord.setCourseDay(exerciseRecord.getCourseDay());
+        newExerciseRecord.setCourseType(exerciseRecord.getCourseType());
+        newExerciseRecord.setUser(exerciseRecord.getUser());
+        return newExerciseRecord;
     }
 
     @Transactional

@@ -55,4 +55,9 @@ public class UserController extends BaseComponent {
   public ResponseEntity<CustomResponse<UserStatisticsViewDto>> getStatistics(Integer age) {
     return CustomResponse.ok(userService.getUserStatistics(age));
   }
+
+  @PostMapping("/pain")
+  public ResponseEntity<CustomResponse<Boolean>> judgeUserPain() {
+    return CustomResponse.ok(userService.judgeUserUpper());
+  }
 }

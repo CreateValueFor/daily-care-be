@@ -2,6 +2,7 @@ package com.example.dailycarebe.user.dto;
 
 import com.example.dailycarebe.base.orm.dto.AbstractRegisterDto;
 import com.example.dailycarebe.user.model.UserGender;
+import com.example.dailycarebe.user.model.UserPain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,6 +12,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -76,4 +78,10 @@ public class UserRegisterDto extends AbstractRegisterDto {
   private Integer anusPainFrequency;
 
   private Integer panicFrequency;
+
+  private Integer wristPain;
+
+  private Integer shoulderPain;
+
+  private Integer elbowPain;
 }

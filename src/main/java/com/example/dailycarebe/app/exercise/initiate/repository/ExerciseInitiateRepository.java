@@ -8,6 +8,6 @@ import com.example.dailycarebe.user.model.UserExerciseType;
 import java.util.List;
 
 public interface ExerciseInitiateRepository extends BaseRepository<ExerciseInitiate> {
-    List<ExerciseInitiate> findAllByUserExerciseTypeAndCourseWeekType(UserExerciseType userExerciseType, CourseWeekType courseWeekType);
+    List<ExerciseInitiate> findAllByUserExerciseTypeAndCourseWeekTypeAndCourseWeek(UserExerciseType userExerciseType, CourseWeekType courseWeekType, Integer courseWeek);
     List<ExerciseInitiate> findAllByUserExerciseTypeAndCourseWeek(UserExerciseType userExerciseType, Integer courseWeek);
 }

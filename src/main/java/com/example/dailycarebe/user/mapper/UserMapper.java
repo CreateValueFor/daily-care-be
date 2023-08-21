@@ -5,11 +5,12 @@ import com.example.dailycarebe.user.dto.UserEditDto;
 import com.example.dailycarebe.user.dto.UserRegisterDto;
 import com.example.dailycarebe.user.dto.UserViewDto;
 import com.example.dailycarebe.user.model.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import com.example.dailycarebe.user.model.UserPain;
+import org.mapstruct.*;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(
   unmappedTargetPolicy = ReportingPolicy.IGNORE,

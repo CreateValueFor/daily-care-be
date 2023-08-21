@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -26,6 +28,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Audited(withModifiedFlag = true)
 public class User extends AbstractAuditingEntity {
 
   private String loginId;
@@ -80,6 +83,7 @@ public class User extends AbstractAuditingEntity {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   @JsonIgnore
   @Builder.Default
+  @NotAudited
   private Set<UserAppRole> roles = new HashSet<>();
 
   @Column
@@ -133,8 +137,25 @@ public class User extends AbstractAuditingEntity {
   @Column
   private Integer panicFrequency;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-  private Set<UserPain> userPains;
+  @Column(nullable = false, columnDefinition = "INT(1) DEFAULT 1")
+  private Integer wristPain;
+
+  @Column(nullable = false, columnDefinition = "INT(1) DEFAULT 1")
+  private Integer shoulderPain;
+
+  @Column(nullable = false, columnDefinition = "INT(1) DEFAULT 1")
+  private Integer elbowPain;
+
+  @Column(nullable = false, columnDefinition = "BIT DEFAULT 0")
+  private Boolean isUpper;
+
+  @Column(nullable = false, columnDefinition = "BIT DEFAULT 0")
+  private Boolean hasUpper;
+
+  @Column
+  @Enumerated(EnumType.STRING)
+  private CourseWeekType upperCourseWeekType;
+
   public static User of(String uuid) {
     User user = new User();
     user.setId(HashidsUtil.decodeNumber(uuid));
