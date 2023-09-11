@@ -19,4 +19,5 @@ public interface ExerciseRecordRepository extends BaseRepository<ExerciseRecord>
     List<ExerciseRecord> findAllByUserAndToday(User user, LocalDate today);
 
     ExerciseRecord findByUserAndCourseTypeAndCourseWeekTypeAndExerciseAndTodayAfterAndExerciseEvaluationType(User user, CourseType courseType, CourseWeekType courseWeekType, Exercise exercise, LocalDate today, ExerciseEvaluationType exerciseEvaluationType);
+    ExerciseRecord findByUserAndCourseTypeAndCourseWeekTypeAndNameAndTodayAfterAndExerciseEvaluationType(User user, CourseType courseType, CourseWeekType courseWeekType, String name, LocalDate today, ExerciseEvaluationType exerciseEvaluationType);
 }

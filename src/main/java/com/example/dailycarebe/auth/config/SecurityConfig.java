@@ -35,7 +35,7 @@ class SecurityConfig {
       .antMatchers(HttpMethod.OPTIONS, "/**")
       .antMatchers(HttpMethod.POST
         , "/api/v1/users"
-        , "/api/v1/users/**"
+        , "/api/v1/users/users"
         , "/api/v1/users/action/login"
         , "/api/v1/auth/kakao"
         , "/api/v1/food/search"

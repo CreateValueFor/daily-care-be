@@ -211,7 +211,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                 exerciseRecord.setCourseWeekType(user.getCourseWeekType());
                 exerciseRecord.setCourseDay(user.getCourseDay());
                 exerciseRecord.setIsCourseUpgradable(true);
-
+                exerciseRecord.setName(exercise.getName());
                 exerciseRecordRepository.save(exerciseRecord);
             });
         }
@@ -257,6 +257,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
             newExerciseRecord.setToday(localDate);
 
 //            newExerciseRecord.setIsCourseUpgradable(newExerciseRecord.getIsCourseUpgradable());
+            newExerciseRecord.setName(newExerciseRecord.getExercise().getName());
 
             exerciseRecordRepository.save(newExerciseRecord);
 
@@ -270,21 +271,28 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 //            //3주차 이상 쉽다 같은강도 한번더 로직
             exerciseList.forEach(todayExerciseRecord -> {
 
-                ExerciseRecord exerciseRecord = exerciseRecordRepository.findByUserAndCourseTypeAndCourseWeekTypeAndExerciseAndTodayAfterAndExerciseEvaluationType(
-                        user, todayExerciseRecord.getCourseType(), todayExerciseRecord.getCourseWeekType(), todayExerciseRecord.getExercise(), user.getNextWeek().minusDays(7), ExerciseEvaluationType.EASY
-                );
+                if(todayExerciseRecord.getCourseWeekType() != CourseWeekType.THIRD || todayExerciseRecord.getCourseDay() != 6) {
+                    ExerciseRecord exerciseRecord = exerciseRecordRepository.findByUserAndCourseTypeAndCourseWeekTypeAndNameAndTodayAfterAndExerciseEvaluationType(
+                            user, todayExerciseRecord.getCourseType(), todayExerciseRecord.getCourseWeekType(), todayExerciseRecord.getExercise().getName(), user.getNextWeek().minusDays(8), ExerciseEvaluationType.EASY
+                    );
 
-                if(exerciseRecord != null) {
-                    ExerciseRecord newExerciseRecord = new ExerciseRecord();
+                    if(exerciseRecord != null) {
+                        if(todayExerciseRecord.getCourseDay() != 6 || todayExerciseRecord.getCourseWeekType() != CourseWeekType.THIRD || todayExerciseRecord.getCourseType() != CourseType.HIGH) {
+                            ExerciseRecord newExerciseRecord = new ExerciseRecord();
 
 
-                    newExerciseRecord.setUser(user);
-                    newExerciseRecord.setExercise(exerciseRecord.getExercise());
-                    newExerciseRecord.setCourseType(exerciseRecord.getCourseType());
-                    newExerciseRecord.setCourseDay(todayExerciseRecord.getCourseDay());
-                    newExerciseRecord.setCourseWeekType(exerciseRecord.getCourseWeekType());
-                    newExerciseRecord.setToday(localDate);
-                    exerciseRecordRepository.save(newExerciseRecord);
+                            newExerciseRecord.setUser(user);
+                            newExerciseRecord.setExercise(todayExerciseRecord.getExercise());
+                            newExerciseRecord.setCourseType(todayExerciseRecord.getCourseType());
+                            newExerciseRecord.setCourseDay(todayExerciseRecord.getCourseDay());
+                            newExerciseRecord.setCourseWeekType(todayExerciseRecord.getCourseWeekType());
+                            newExerciseRecord.setToday(localDate);
+                            newExerciseRecord.setName(todayExerciseRecord.getExercise().getName());
+                            exerciseRecordRepository.save(newExerciseRecord);
+
+
+                        }
+                    }
 
                 }
             });
@@ -300,6 +308,8 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
         if(yesterdayExerciseList.size() > 13) {
             yesterdayExerciseList = yesterdayExerciseList.subList(0,13);
         }
+
+
         yesterdayExerciseList.forEach(exercise -> {
 
             if(
@@ -326,24 +336,24 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                         repository.findByPostureTypeAndName(PostureType.UPPER, exercise.getExercise().getName())
                 );
             } else {
-                if(user.getHasUpper()) {
-                    if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
+                if(user.getHasUpper() && exercise.getId() > 36) {
+//                    if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
                         exerciseRecord.setExercise(
                                 repository.findByPostureTypeAndName(PostureType.EASY, exercise.getExercise().getName())
                         );
-
-                    } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
-                        exerciseRecord.setExercise(
-                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
-                        );
-                    } else if (user.getUpperCourseWeekType() == CourseWeekType.THIRD) {
-                        exerciseRecord.setExercise(
-                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
-                        );
-                    }
+//
+//                    } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
+//                        exerciseRecord.setExercise(
+//                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+//                        );
+//                    } else if (user.getUpperCourseWeekType() == CourseWeekType.THIRD) {
+//                        exerciseRecord.setExercise(
+//                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
+//                        );
+//                    }
 
                 } else {
-                    if(exercise.getIsCourseUpgradable()) {
+                    if(exercise.getIsCourseUpgradable() && !exercise.getIsAllNull()) {
                         if(exercise.getExercise().getPostureType() == PostureType.EASY) {
                             exerciseRecord.setExercise(repository.findByPostureTypeAndName(
                                     PostureType.NORMAL, exercise.getExercise().getName()
@@ -365,7 +375,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
             }
 
-            if(exercise.getIsCourseUpgradable()) {
+            if(exercise.getIsCourseUpgradable() && !exercise.getIsAllNull()) {
                 if(exercise.getCourseWeekType() == CourseWeekType.FIRST) {
                     exerciseRecord.setCourseWeekType(CourseWeekType.SECOND);
                 } else {
@@ -373,6 +383,10 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                 }
             } else {
                 exerciseRecord.setCourseWeekType(exercise.getCourseWeekType());
+            }
+
+            if(user.getHasUpper() && exercise.getId() > 36) {
+                exerciseRecord.setCourseWeekType(CourseWeekType.FIRST);
             }
 
             CourseType courseType =
@@ -384,13 +398,14 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
             exerciseRecord.setCourseType(courseType);
 
-            if(user.getUpperCourseWeekType() != null ) {
-                exerciseRecord.setCourseWeekType(user.getUpperCourseWeekType());
-            }
+//            if(user.getUpperCourseWeekType() != null ) {
+//                exerciseRecord.setCourseWeekType(user.getUpperCourseWeekType());
+//            }
 
             exerciseRecord.setCourseDay(user.getCourseDay());
             exerciseRecord.setToday(localDate);
             exerciseRecord.setIsCourseUpgradable(true);
+            exerciseRecord.setName(exerciseRecord.getExercise().getName());
             exerciseRecordRepository.save(exerciseRecord);
 
         });
@@ -408,25 +423,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
                         repository.findByPostureTypeAndName(PostureType.UPPER, exercise.getExercise().getName())
                 );
             } else {
-                if(user.getHasUpper()) {
-                    if(user.getUpperCourseWeekType() == CourseWeekType.FIRST) {
-                        exerciseRecord.setExercise(
-                                repository.findByPostureTypeAndName(PostureType.EASY, exercise.getExercise().getName())
-                        );
-
-                    } else if(user.getUpperCourseWeekType() == CourseWeekType.SECOND) {
-                        exerciseRecord.setExercise(
-                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
-                        );
-                    } else if (user.getUpperCourseWeekType() == CourseWeekType.THIRD) {
-                        exerciseRecord.setExercise(
-                                repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getExercise().getName())
-                        );
-                    }
-
-                } else {
-                    exerciseRecord.setExercise(exercise.getExercise());
-                }
+                exerciseRecord.setExercise(exercise.getExercise());
 
             }
                     CourseType courseType =
@@ -439,13 +436,11 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
             exerciseRecord.setCourseType(courseType);
 
             exerciseRecord.setCourseWeekType(exercise.getCourseWeekType());
-            if(user.getUpperCourseWeekType() != null ) {
-                exerciseRecord.setCourseWeekType(user.getUpperCourseWeekType());
-            }
 
             exerciseRecord.setCourseDay(user.getCourseDay());
             exerciseRecord.setToday(localDate);
             exerciseRecord.setIsCourseUpgradable(true);
+            exerciseRecord.setName(exerciseRecord.getExercise().getName());
             exerciseRecordRepository.save(exerciseRecord);
         });
 
@@ -457,56 +452,69 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
         ExerciseRecord newExerciseRecord = new ExerciseRecord();
         newExerciseRecord.setIsCourseUpgradable(exerciseRecord.getIsCourseUpgradable());
         newExerciseRecord.setExercise(exerciseRecord.getExercise());
-        if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT) {
-            //4. 코스 상향은 매주 증가하지만 첫번째 고강도에서 ‘어렵다’로 응답할 경우 안함.
-            //두번째, 세번째 고강도에서 '어렵다'라고 해도 아무 영향 없음
-            if(
-                    (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
-                            && exerciseRecord.getCourseDay() == 3)
-                            ||
-                            (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
-                                    && exerciseRecord.getCourseDay() == 3)
-                            ||
-                            (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
-                                    && exerciseRecord.getCourseDay() == 2)
-            ) {
-                //테스트 후 수정
-                newExerciseRecord.setIsCourseUpgradable(false);
-            }
-            Exercise exercise = exerciseRecord.getExercise();
+        if(exerciseRecord.getExerciseEvaluationType() != ExerciseEvaluationType.NULL) {
+            newExerciseRecord.setIsAllNull(false);
+        } else {
+            newExerciseRecord.setIsAllNull(exerciseRecord.getIsAllNull());
+        }
 
-            //6. 대상자가 어느 강도에서 든지 동작을 ‘어렵다’로 응답할 경우 다음날 자세 하향 (그 다음주에 영향 미치지 않음)
-            if(exercise.getPostureType() == PostureType.DIFFICULT) {
-                exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
+        if(getContextUser().getIsUpper()) {
 
-            } else{
-                exercise = repository.findByPostureTypeAndName(PostureType.EASY, exercise.getName());
-            }
+            newExerciseRecord.setExercise(exerciseRecord.getExercise());
 
-            newExerciseRecord.setExercise(exercise);
-        } else if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.EASY) {
-            //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
-            if(
-                    (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
-                            && exerciseRecord.getCourseDay() == 3)
-                            ||
-                            (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
-                                    && exerciseRecord.getCourseDay() == 3)
-                            ||
-                            (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
-                                    && exerciseRecord.getCourseDay() == 2)
-            ) {
-                //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
+        } else {
+            if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.DIFFICULT) {
+                //4. 코스 상향은 매주 증가하지만 첫번째 고강도에서 ‘어렵다’로 응답할 경우 안함.
+                //두번째, 세번째 고강도에서 '어렵다'라고 해도 아무 영향 없음
+                if(
+                        (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
+                                && exerciseRecord.getCourseDay() == 3)
+                                ||
+                                (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
+                                        && exerciseRecord.getCourseDay() == 3)
+                                ||
+                                (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
+                                        && exerciseRecord.getCourseDay() == 2)
+                ) {
+                    //테스트 후 수정
+                    newExerciseRecord.setIsCourseUpgradable(false);
+                }
                 Exercise exercise = exerciseRecord.getExercise();
 
-                if(exercise.getPostureType() == PostureType.EASY) {
+                //6. 대상자가 어느 강도에서 든지 동작을 ‘어렵다’로 응답할 경우 다음날 자세 하향 (그 다음주에 영향 미치지 않음)
+                if(exercise.getPostureType() == PostureType.DIFFICULT) {
                     exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
 
                 } else{
-                    exercise = repository.findByPostureTypeAndName(PostureType.DIFFICULT, exercise.getName());
+                    exercise = repository.findByPostureTypeAndName(PostureType.EASY, exercise.getName());
                 }
 
                 newExerciseRecord.setExercise(exercise);
+            } else if(exerciseRecord.getExerciseEvaluationType() == ExerciseEvaluationType.EASY) {
+                //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
+                if(
+                        (exerciseRecord.getCourseWeekType() == CourseWeekType.FIRST
+                                && exerciseRecord.getCourseDay() == 3)
+                                ||
+                                (exerciseRecord.getCourseWeekType() == CourseWeekType.SECOND
+                                        && exerciseRecord.getCourseDay() == 3)
+                                ||
+                                (exerciseRecord.getCourseWeekType() == CourseWeekType.THIRD
+                                        && exerciseRecord.getCourseDay() == 2)
+                ) {
+                    //7. 첫번째 고강도에서 ‘쉽다’로 응답할 경우 다음날 자세 상향  (그 다음주에 영향 미치지 않음)
+                    Exercise exercise = exerciseRecord.getExercise();
+
+                    if(exercise.getPostureType() == PostureType.EASY) {
+                        exercise = repository.findByPostureTypeAndName(PostureType.NORMAL, exercise.getName());
+
+                    } else{
+                        exercise = repository.findByPostureTypeAndName(PostureType.DIFFICULT, exercise.getName());
+                    }
+
+                    newExerciseRecord.setExercise(exercise);
+                }
+
             }
 
         }

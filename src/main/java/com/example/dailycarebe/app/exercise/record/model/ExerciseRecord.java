@@ -49,4 +49,10 @@ public class ExerciseRecord extends AbstractAuditingEntity {
 
     @Column(columnDefinition = "BIT DEFAULT 1")
     private Boolean isCourseUpgradable;
+
+    @Column(columnDefinition = "BIT DEFAULT 1")
+    private Boolean isAllNull;
+
+    @Column
+    private String name;
 }
