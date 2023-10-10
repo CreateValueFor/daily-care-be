@@ -11,4 +11,6 @@ public interface FoodRepository extends BaseRepository<Food> {
     List<Food> findAllByUser(User user);
 
     Food findByUserAndStartTime(User user, LocalDateTime startTime);
+
+    List<Food> findAllByUserAndStartTimeAfterAndStartTimeBefore(User user, LocalDateTime startTime, LocalDateTime startTime2);
 }

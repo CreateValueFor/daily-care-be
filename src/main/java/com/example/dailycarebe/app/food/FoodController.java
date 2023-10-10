@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -31,6 +33,11 @@ public class FoodController extends BaseComponent {
     @GetMapping("/get")
     public ResponseEntity<CustomResponse<List<FoodViewDto>>> getAll() {
         return CustomResponse.ok(foodService.getAll());
+    }
+
+    @GetMapping("/one")
+    public ResponseEntity<CustomResponse<List<FoodViewDto>>> getOne(String localDate) {
+        return CustomResponse.ok(foodService.getDay(LocalDate.parse(localDate)));
     }
 
     @PostMapping("/edit")

@@ -13,6 +13,10 @@ import com.example.dailycarebe.app.exercise.record.repository.ExerciseRecordRepo
 import com.example.dailycarebe.app.exercise.repository.CourseMapRepository;
 import com.example.dailycarebe.app.exercise.repository.ExerciseAdditionalRepository;
 import com.example.dailycarebe.app.exercise.repository.ExerciseRepository;
+import com.example.dailycarebe.app.exercise.tmp.dto.ExerciseTmpViewDto;
+import com.example.dailycarebe.app.exercise.tmp.mapper.ExerciseTmpMapper;
+import com.example.dailycarebe.app.exercise.tmp.model.ExerciseTmp;
+import com.example.dailycarebe.app.exercise.tmp.repository.ExerciseTmpRepository;
 import com.example.dailycarebe.base.BaseService;
 import com.example.dailycarebe.exception.InvalidKeyException;
 import com.example.dailycarebe.user.model.User;
@@ -45,8 +49,12 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
     private final ExerciseAdditionalRepository exerciseAdditionalRepository;
 
+    private final ExerciseTmpRepository exerciseTmpRepository;
+
+    private final ExerciseTmpMapper exerciseTmpMapper;
+
     @Transactional
-    public List<ExerciseRecordViewDto> getMyTodayExercise(LocalDate localDate) {
+    public List<ExerciseTmpViewDto> getMyTodayExercise(LocalDate localDate) {
 
         User user = userRepository.getReferenceById(SecurityContextUtil.getUserId());
 
@@ -144,13 +152,79 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 
             }
 
+            List<ExerciseRecord> exerciseList =
+                    exerciseRecordRepository.findAllByUserAndToday(user, localDate);
+
+            if(exerciseList.size() < 5) {
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+            } else if(exerciseList.size() < 9) {
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+            } else {
+                exerciseList.forEach(exerciseRecord -> {
+                    ExerciseTmp exerciseTmp = new ExerciseTmp();
+                    exerciseTmp.setExerciseRecord(exerciseRecord);
+                    exerciseTmp.setUser(exerciseRecord.getUser());
+                    exerciseTmp.setToday(exerciseRecord.getToday());
+                    exerciseTmp.setComplete(false);
+                    exerciseTmp.setExerciseEvaluationType(ExerciseEvaluationType.NULL);
+                    exerciseTmpRepository.save(exerciseTmp);
+                });
+
+            }
         }
 
 
-        List<ExerciseRecord> exerciseList =
-                exerciseRecordRepository.findAllByUserAndToday(user, localDate);
+//        List<ExerciseRecord> exerciseList =
+//                exerciseRecordRepository.findAllByUserAndToday(user, localDate);
 
 
+        List<ExerciseTmp> exerciseTmps
+                = exerciseTmpRepository.findAllByUserAndToday(user, localDate);
+
+        return exerciseTmpMapper.entitiesToDtos(exerciseTmps);
         //2,3
 //        if(user.getCourseWeekType() == CourseWeekType.THIRD) {
 //            if(user.getCourseDay() == 3) {
@@ -178,7 +252,7 @@ public class ExerciseService extends BaseService<Exercise, ExerciseRepository> {
 //            }
 //        }
 //
-        return exerciseRecordMapper.entitiesToDtos(exerciseList);
+//        return exerciseRecordMapper.entitiesToDtos(exerciseList);
     }
 
 

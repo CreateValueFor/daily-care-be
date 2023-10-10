@@ -272,6 +272,11 @@ public class UserService extends BaseService<User, UserRepository> {
 
   }
 
+  @Transactional(readOnly = true)
+  public Boolean isExist(String loginId) {
+    return repository.findByLoginId(loginId).isPresent();
+  }
+
   @Transactional
   public Boolean judgeUserUpper() {
     User user = getContextUser();

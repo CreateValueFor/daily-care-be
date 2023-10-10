@@ -28,8 +28,8 @@ public class OauthController extends BaseComponent {
 
 
   @PostMapping("/kakao")
-  public ResponseEntity<CustomResponse<UserAuthDto>> kakaoCallback(String code, HttpServletRequest request) throws InvalidKeySpecException, NoSuchAlgorithmException {
-    String token = kakaoOauthService.getKaKaoAccessToken(code, request);
+  public ResponseEntity<CustomResponse<UserAuthDto>> kakaoCallback(String token, HttpServletRequest request) throws InvalidKeySpecException, NoSuchAlgorithmException {
+//    String token = kakaoOauthService.getKaKaoAccessToken(code, request);
     return CustomResponse.ok(oauthService.authSocialUser(token, ProviderType.KAKAO));
   }
 

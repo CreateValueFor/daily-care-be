@@ -5,8 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalTime;
 
 @Entity
@@ -20,5 +19,7 @@ public class MovementDetail extends AbstractAuditingEntity {
 
     private LocalTime localTime;
 
+    @Enumerated(EnumType.STRING)
+    @Column
     private MovementType movementType;
 }

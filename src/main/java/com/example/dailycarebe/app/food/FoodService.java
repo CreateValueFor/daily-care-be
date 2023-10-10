@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,5 +63,13 @@ public class FoodService extends BaseService<Food, FoodRepository> {
 
 
         return foodMapper.entitiesToDtos(repository.findAllByUser(user));
+    }
+
+    @Transactional(readOnly = true)
+    public List<FoodViewDto> getDay(LocalDate localDate) {
+        User user = getContextUser();
+
+        LocalDateTime localDateTime1 = localDate.atStartOfDay();
+        return foodMapper.entitiesToDtos(repository.findAllByUserAndStartTimeAfterAndStartTimeBefore(user, localDateTime1, localDateTime1.plusDays(1)));
     }
 }

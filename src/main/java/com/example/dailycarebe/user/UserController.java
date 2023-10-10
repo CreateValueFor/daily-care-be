@@ -60,4 +60,10 @@ public class UserController extends BaseComponent {
   public ResponseEntity<CustomResponse<Boolean>> judgeUserPain() {
     return CustomResponse.ok(userService.judgeUserUpper());
   }
+
+  @GetMapping("/exist")
+  public ResponseEntity<CustomResponse<Boolean>> exist(String loginId) {
+    return CustomResponse.ok(userService.isExist(loginId));
+  }
+
 }
