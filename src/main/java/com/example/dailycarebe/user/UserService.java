@@ -1,6 +1,13 @@
 package com.example.dailycarebe.user;
 
 import com.example.dailycarebe.app.exercise.model.CourseWeekType;
+import com.example.dailycarebe.app.exercise.record.repository.ExerciseRecordRepository;
+import com.example.dailycarebe.app.exercise.repository.ExerciseRepository;
+import com.example.dailycarebe.app.food.model.Food;
+import com.example.dailycarebe.app.food.repository.FoodRepository;
+import com.example.dailycarebe.app.movement.model.Movement;
+import com.example.dailycarebe.app.movement.model.MovementType;
+import com.example.dailycarebe.app.movement.repository.MovementRepository;
 import com.example.dailycarebe.auth.authentication.AppUserDetails;
 import com.example.dailycarebe.auth.authentication.AppUserDetailsService;
 import com.example.dailycarebe.auth.authentication.dto.UserAuthDto;
@@ -16,10 +23,7 @@ import com.example.dailycarebe.oauth.social.kakao.model.KakaoAccount;
 import com.example.dailycarebe.oauth.social.kakao.model.KakaoProperties;
 import com.example.dailycarebe.user.auth.authorization.UserAppRoleService;
 import com.example.dailycarebe.user.auth.authorization.repository.PasswordResetTokenRepository;
-import com.example.dailycarebe.user.dto.UserEditDto;
-import com.example.dailycarebe.user.dto.UserLoginDto;
-import com.example.dailycarebe.user.dto.UserRegisterDto;
-import com.example.dailycarebe.user.dto.UserViewDto;
+import com.example.dailycarebe.user.dto.*;
 import com.example.dailycarebe.user.mapper.UserMapper;
 import com.example.dailycarebe.user.model.*;
 import com.example.dailycarebe.user.repository.UserRepository;
@@ -64,6 +68,11 @@ public class UserService extends BaseService<User, UserRepository> {
 
   private final UserStatisticsRepository userStatisticsRepository;
 
+  private final MovementRepository movementRepository;
+
+  private final ExerciseRecordRepository exerciseRecordRepository;
+
+  private final FoodRepository foodRepository;
 
   @Autowired
   @Qualifier("userAuthenticationProvider")
@@ -275,6 +284,102 @@ public class UserService extends BaseService<User, UserRepository> {
   @Transactional(readOnly = true)
   public Boolean isExist(String loginId) {
     return repository.findByLoginId(loginId).isPresent();
+  }
+
+  @Transactional(readOnly = true)
+  public UserStatisticsDto statistics() {
+    User user = getContextUser();
+    LocalDate localDate = user.getNextWeek();
+
+    UserStatisticsDto dto = new UserStatisticsDto();
+    List<Integer> i = new ArrayList<>();
+    List<Integer> j = new ArrayList<>();
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(6), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(6), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(6), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(5), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(5), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(5), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(4), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(4), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(4), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(3), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(3), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(3), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(2), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(2), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(2), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(1), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(1), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(1), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    if (movementRepository.findByLocalDateAndUser(localDate.minusDays(0), user).isPresent()) {
+      i.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(0), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.GREAT).count());
+      j.add((int) movementRepository.findByLocalDateAndUser(localDate.minusDays(0), user).get().getMovementDetails().stream().filter(e -> e.getMovementType() == MovementType.BAD).count());
+
+    }
+    dto.setGoodStoolCountList(i);
+    dto.setBadStoolCountList(j);
+
+
+    dto.setExerciseCount(exerciseRecordRepository.findAllByUser(user).size());
+
+    dto.setAverageGoodStoolCount(0);
+    dto.setAverageGoodStoolCountFromLastWeek(0);
+    dto.setAverageGoodStoolCountFromFirstWeek(0);
+    dto.setExerciseCount(0);
+    dto.setExerciseCountLastWeekFromLastWeek(0);
+    dto.setExerciseCountLastWeekFromFirstWeek(0);
+
+
+    Map<String, Integer> m = new HashMap<>();
+    Map<String, Integer> n = new HashMap<>();
+
+    List<Movement> movementList = movementRepository.findAllByUser(user);
+
+    for (Movement movement : movementList) {
+      if(movement.getMovementDetails().stream().anyMatch(e -> e.getMovementType() == MovementType.GREAT)) {
+        List<Food> foodsL = foodRepository.findAllByUserAndStartTimeAfterAndStartTimeBefore(user,
+                movement.getLocalDate().minusDays(1).atStartOfDay(),
+                movement.getLocalDate().minusDays(0).atStartOfDay()
+                );
+        for (Food food : foodsL) {
+          if(m.containsKey(food.getSubject())) {
+            m.put(food.getSubject(),m.get(food.getSubject()) + 1);
+          } else {
+            m.put(food.getSubject(),1);
+          }
+
+        }
+      }
+      if(movement.getMovementDetails().stream().anyMatch(e -> e.getMovementType() == MovementType.BAD)) {
+        List<Food> foodsL = foodRepository.findAllByUserAndStartTimeAfterAndStartTimeBefore(user,
+                movement.getLocalDate().minusDays(1).atStartOfDay(),
+                movement.getLocalDate().minusDays(0).atStartOfDay()
+                );
+        for (Food food : foodsL) {
+          if(m.containsKey(food.getSubject())) {
+            m.put(food.getSubject(),m.get(food.getSubject()) + 1);
+          } else {
+            m.put(food.getSubject(),1);
+          }
+
+        }
+      }
+    }
+    dto.setGoodFood(m);
+    dto.setBadFood(n);
+    return dto;
   }
 
   @Transactional

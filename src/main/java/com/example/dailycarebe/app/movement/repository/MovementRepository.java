@@ -12,4 +12,6 @@ public interface MovementRepository extends BaseRepository<Movement> {
     Optional<Movement> findByLocalDateAndUser(LocalDate localDate, User user);
 
     List<Movement> findAllByUserOrderByLocalDateAsc(User user);
+
+    List<Movement> findAllByUser(User user);
 }
