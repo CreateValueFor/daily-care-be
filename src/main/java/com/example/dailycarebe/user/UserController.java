@@ -19,6 +19,12 @@ import javax.validation.Valid;
 public class UserController extends BaseComponent {
   private final UserService userService;
 
+  @GetMapping("/exist")
+  public ResponseEntity<CustomResponse<Boolean>> exist(String loginId) {
+    CustomResponse.ok(userService.isExist(loginId));
+    return CustomResponse.ok(userService.isExist(loginId));
+  }
+
   @PostMapping
   public ResponseEntity<CustomResponse<UserAuthDto>> register(
     @Valid @RequestBody @ApiParam(name = "user 가입 정보", required = true) UserRegisterDto registerDto) {
@@ -58,10 +64,7 @@ public class UserController extends BaseComponent {
     return CustomResponse.ok(userService.judgeUserUpper());
   }
 
-  @GetMapping("/exist")
-  public ResponseEntity<CustomResponse<Boolean>> exist(String loginId) {
-    return CustomResponse.ok(userService.isExist(loginId));
-  }
+
 
   @GetMapping("/statistics")
   public ResponseEntity<CustomResponse<UserStatisticsDto>> statistics() {

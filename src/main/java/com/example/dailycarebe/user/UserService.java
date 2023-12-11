@@ -283,6 +283,7 @@ public class UserService extends BaseService<User, UserRepository> {
 
   @Transactional(readOnly = true)
   public Boolean isExist(String loginId) {
+    System.out.println(repository.findByLoginId(loginId).isPresent());
     return repository.findByLoginId(loginId).isPresent();
   }
 

@@ -31,15 +31,17 @@ class SecurityConfig {
 
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
+    System.out.println("aasdfasdf");
     return (web) -> web.ignoring()
       .antMatchers(HttpMethod.OPTIONS, "/**")
       .antMatchers(HttpMethod.POST
         , "/api/v1/users"
         , "/api/v1/users/users"
+              , "/api/v1/users/**"
         , "/api/v1/users/action/login"
         , "/api/v1/auth/kakao"
         , "/api/v1/food/search"
-//        , "/api/v1/food/**"
+        , "/api/v1/food/**"
 
       )
       .antMatchers(HttpMethod.GET
@@ -47,6 +49,7 @@ class SecurityConfig {
         , "/api/v1/action/convert-hash"
         , "/api/v1/action/convert-id"
         , "/api/v1/users/age"
+              , "/api/v1/users/**"
         , "/api/v1/food/search"
 //        , "/api/v1/food/**"
       )
